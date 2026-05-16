@@ -59,27 +59,32 @@ export default function Report({ score, profile }) {
     <div className="flex flex-col">
       <div className="flex-1 max-w-[850px] mx-auto w-full px-6 pt-10 pb-16">
 
-        <div className="relative mb-4">
-          <div className="flex justify-end">
+        <div ref={reportRef}>
+          <div className="relative">
             <button
-              type="button"
               onClick={downloadReport}
-              disabled={downloading}
-              title="Download Report"
-              aria-label="Download Report"
-              className="rounded-full p-2 bg-transparent border border-[#E8DDD0] hover:bg-[#F3E8DA] transition-colors flex items-center justify-center"
-              style={{ backgroundColor: 'transparent' }}
+              className={
+                `absolute right-0 top-0 z-10
+                flex h-10 w-10 items-center justify-center
+                rounded-full
+                border border-[#E8DDD0]
+                bg-white/70
+                text-[#5B4A3B]
+                backdrop-blur-sm
+                transition
+                hover:bg-[#FAF7F2]`
+              }
+              aria-label="Download report"
+              title="Download report"
+              type="button"
             >
               {downloading ? (
                 <span className="w-4 h-4 border-2 border-[#5B4A3B] border-t-transparent rounded-full animate-spin" />
               ) : (
-                <Download size={16} color="#5B4A3B" />
+                <Download size={17} strokeWidth={1.75} />
               )}
             </button>
-          </div>
-        </div>
 
-        <div ref={reportRef}>
 
         {/* Hero — 2 columns desktop, stacked mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
