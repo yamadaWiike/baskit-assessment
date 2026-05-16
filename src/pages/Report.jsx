@@ -44,7 +44,7 @@ export default function Report({ score, profile }) {
         margin: 12,
         filename: 'baskit-assessment-report.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#FBFAF7', foreignObjectRendering: true },
         jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
       }
       await html2pdf().set(opt).from(reportRef.current).save()
@@ -59,33 +59,34 @@ export default function Report({ score, profile }) {
     <div className="flex flex-col">
       <div className="flex-1 max-w-[850px] mx-auto w-full px-6 pt-10 pb-16">
 
+        {/* Download action (not part of export) */}
+        <div className="relative mb-4 flex justify-end">
+          <button
+            onClick={downloadReport}
+            className={
+              `absolute right-0 top-0 z-10
+              flex h-10 w-10 items-center justify-center
+              rounded-full
+              border border-[#E8DDD0]
+              bg-white/70
+              text-[#5B4A3B]
+              backdrop-blur-sm
+              transition
+              hover:bg-[#FAF7F2]`
+            }
+            aria-label="Download report"
+            title="Download report"
+            type="button"
+          >
+            {downloading ? (
+              <span className="w-4 h-4 border-2 border-[#5B4A3B] border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Download size={17} strokeWidth={1.75} />
+            )}
+          </button>
+        </div>
+
         <div ref={reportRef}>
-          <div className="relative">
-            <button
-              onClick={downloadReport}
-              className={
-                `absolute right-0 top-0 z-10
-                flex h-10 w-10 items-center justify-center
-                rounded-full
-                border border-[#E8DDD0]
-                bg-white/70
-                text-[#5B4A3B]
-                backdrop-blur-sm
-                transition
-                hover:bg-[#FAF7F2]`
-              }
-              aria-label="Download report"
-              title="Download report"
-              type="button"
-            >
-              {downloading ? (
-                <span className="w-4 h-4 border-2 border-[#5B4A3B] border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Download size={17} strokeWidth={1.75} />
-              )}
-            </button>
-
-
         {/* Hero — 2 columns desktop, stacked mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
           {/* Left */}
@@ -147,7 +148,10 @@ export default function Report({ score, profile }) {
           />
         </div>
 
-        {/* What happens next */}
+        {/* end of exportable report content */}
+        </div>
+
+        {/* What happens next (NOT included in PDF) */}
         <div className="bg-[#00312F] border border-[#E2DDD5] rounded-2xl p-8 text-left  mb-8">
           <h2 className="font-sans font-semibold text-[26px] text-white mb-2">{t('next_steps_headline')}</h2>
           <p
@@ -171,9 +175,6 @@ export default function Report({ score, profile }) {
               {t('btn_schedule')}
             </a>
           </div>
-        </div>
-        </div>
-
       </div>
 
       {/* Footer */}
