@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Baskit Assessment — Visual Reference v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:   #FF8B00;
+  --primary-lt:#FFF4E6;
+  --primary-bd:#FFD199;
+  --secondary: #085B59;
+  --text-dk:   #383B46;
+  --text-df:   #4C4F59;
+  --text-lt:   #9B9CA1;
+  --bg:        #FAFAF7;
+  --white:     #FFFFFF;
+  --border:    #E2DDD5;
+  --surface:   #F5F2EC;
+  --sidebar-bg:#021212;
+  --cyan:      #7ED6DF;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text-df);line-height:1.6;font-size:15px;}
+.page{display:none;}.page.active{display:block;}
+
+/* NAV */
+.assess-nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text-dk);}
+.logo em{color:var(--primary);font-style:normal;}
+.lang-switch{display:flex;align-items:center;gap:2px;font-size:13px;}
+.lang-btn{padding:4px 8px;border-radius:6px;cursor:pointer;color:var(--text-lt);font-weight:500;border:none;background:none;}
+.lang-btn.active{color:var(--primary);font-weight:700;}
+.lang-divider{color:var(--border);}
+
+/* PROGRESS BAR */
+.progress-wrap{padding:1.25rem 1.5rem 0;max-width:560px;margin:0 auto;}
+.progress-meta{display:flex;justify-content:space-between;margin-bottom:6px;}
+.progress-label{font-size:12px;color:var(--text-lt);font-weight:500;}
+.progress-track{height:4px;background:var(--border);border-radius:100px;}
+.progress-fill{height:4px;background:var(--secondary);border-radius:100px;transition:width 0.4s ease;}
+
+/* QUESTION SCREEN — centered, not full width */
+.q-outer{padding:0 1.5rem 6rem;display:flex;justify-content:center;}
+.q-inner{width:100%;max-width:560px;}
+.q-screen{padding-top:2rem;}
+.q-num{font-size:11px;color:var(--text-lt);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:0.75rem;}
+.q-text{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text-dk);line-height:1.3;margin-bottom:1.75rem;letter-spacing:-0.2px;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.option{padding:16px 18px;border:1.5px solid var(--border);border-radius:14px;font-size:15px;color:var(--text-df);cursor:pointer;background:var(--white);transition:all 0.15s;text-align:left;width:100%;}
+.option:hover{border-color:var(--primary);background:var(--primary-lt);}
+.option.selected{border-color:var(--primary);background:var(--primary-lt);color:var(--text-dk);font-weight:600;}
+
+/* MICRO-FEEDBACK */
+.feedback-wrap{margin-top:14px;min-height:0;}
+.feedback-card{padding:14px 16px;background:var(--primary-lt);border:1px solid var(--primary-bd);border-radius:12px;display:flex;align-items:flex-start;gap:10px;animation:fadeUp 0.25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.feedback-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.feedback-title{font-size:13px;font-weight:700;color:var(--text-dk);margin-bottom:2px;}
+.feedback-msg{font-size:13px;color:var(--text-df);line-height:1.55;}
+
+/* STICKY NEXT */
+.next-wrap{position:fixed;bottom:0;left:0;right:0;padding:1rem 1.5rem;background:rgba(250,250,247,0.95);backdrop-filter:blur(8px);border-top:1px solid var(--border);}
+.next-inner{max-width:560px;margin:0 auto;}
+.btn-next{width:100%;background:var(--primary);color:white;border:none;padding:14px;border-radius:100px;font-size:15px;font-weight:700;font-family:'Open Sans',sans-serif;cursor:pointer;transition:background 0.2s;}
+.btn-next:hover{background:#E67E00;}
+.btn-next:disabled{background:var(--border);color:var(--text-lt);cursor:not-allowed;}
+
+/* LOADING */
+.loading-page{min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:3rem 1.5rem 2rem;}
+.loading-top{display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center;gap:2rem;}
+.ring-wrap{position:relative;width:120px;height:120px;}
+.ring-svg{width:120px;height:120px;overflow:visible;}
+.ring-track{fill:none;stroke:var(--border);stroke-width:8;stroke-linecap:round;}
+.ring-fill{fill:none;stroke:var(--primary);stroke-width:8;stroke-linecap:round;stroke-dasharray:314;stroke-dashoffset:80;}
+.ring-glow{fill:none;stroke:var(--primary);stroke-width:18;stroke-linecap:round;opacity:0.12;stroke-dasharray:314;stroke-dashoffset:80;}
+.ring-num-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-num{font-family:'DM Serif Display',serif;font-size:36px;color:var(--text-dk);line-height:1;}
+.ring-pct{font-size:12px;color:var(--text-lt);}
+.loading-msg{font-size:15px;color:var(--text-df);text-align:center;min-height:48px;}
+.loading-msg em{color:var(--primary);font-style:normal;font-weight:600;}
+.testi-section{width:100%;max-width:400px;}
+.testi-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-lt);font-weight:600;text-align:center;margin-bottom:1rem;}
+.testi-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;}
+.testi-quote-mark{font-size:28px;color:var(--primary);font-family:'DM Serif Display',serif;line-height:1;margin-bottom:0.4rem;}
+.testi-text{font-size:13.5px;color:var(--text-df);line-height:1.7;font-style:italic;margin-bottom:1rem;}
+.testi-person{display:flex;align-items:center;gap:10px;}
+.testi-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-lt);border:1px solid var(--primary-bd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);flex-shrink:0;}
+.testi-name{font-size:13px;font-weight:700;color:var(--text-dk);}
+.testi-role{font-size:12px;color:var(--text-lt);}
+
+/* GATE FORM */
+.gate-page{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem;}
+.gate-inner{max-width:460px;width:100%;}
+.gate-eyebrow{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:0.75rem;}
+.gate-headline{font-family:'DM Serif Display',serif;font-size:30px;color:var(--text-dk);line-height:1.15;margin-bottom:0.6rem;letter-spacing:-0.2px;}
+.gate-sub{font-size:14px;color:var(--text-lt);line-height:1.7;margin-bottom:1.25rem;}
+.gate-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem;}
+.gate-tag{background:var(--primary-lt);border:1px solid var(--primary-bd);color:var(--primary);font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:100px;}
+.gate-divider{height:1px;background:var(--border);margin-bottom:1.5rem;}
+.form-stack{display:flex;flex-direction:column;gap:14px;}
+.field-wrap{display:flex;flex-direction:column;gap:5px;}
+.field-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-lt);font-weight:700;}
+.field-req{color:#E53E3E;}
+.field-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Open Sans',sans-serif;color:var(--text-dk);background:var(--white);outline:none;transition:border-color 0.2s;}
+.field-input:focus{border-color:var(--primary);}
+.field-input::placeholder{color:var(--text-lt);}
+.field-input.error{border-color:#E53E3E;}
+.select-wrap{position:relative;}
+.select-wrap select{-webkit-appearance:none;appearance:none;}
+.select-chevron{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-lt);}
+.btn-primary{width:100%;background:var(--primary);color:white;border:none;padding:15px;border-radius:100px;font-size:15px;font-weight:700;font-family:'Open Sans',sans-serif;cursor:pointer;transition:background 0.2s;}
+.btn-primary:hover{background:#E67E00;}
+.privacy-note{text-align:center;font-size:12px;color:var(--text-lt);margin-top:0.25rem;}
+
+/* REPORT */
+.report-page{background:var(--bg);min-height:100vh;}
+.report-nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.report-body{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+
+/* Report hero — 2 column */
+.report-hero{display:grid;grid-template-columns:1fr auto;gap:2.5rem;align-items:center;margin-bottom:2.5rem;}
+.report-hero-left{}
+.report-eyebrow{font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:0.75rem;}
+.report-headline{font-family:'DM Serif Display',serif;font-size:36px;color:var(--text-dk);line-height:1.1;margin-bottom:0.75rem;letter-spacing:-0.4px;}
+.report-sub{font-size:14px;color:var(--text-lt);line-height:1.75;max-width:380px;}
+.report-hero-right{display:flex;flex-direction:column;align-items:center;gap:0.75rem;flex-shrink:0;}
+
+/* Gauge */
+.gauge-svg-wrap{position:relative;width:200px;height:120px;}
+.gauge-svg{width:200px;height:120px;overflow:visible;}
+.gauge-num-wrap{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;}
+.gauge-num{font-family:'DM Serif Display',serif;font-size:48px;color:var(--text-dk);line-height:1;letter-spacing:-2px;}
+.gauge-denom{font-size:14px;color:var(--text-lt);}
+.gauge-badge{background:var(--primary-lt);border:1.5px solid var(--primary-bd);color:var(--primary);font-size:12px;font-weight:700;padding:5px 16px;border-radius:100px;letter-spacing:0.3px;}
+.scale-bar-wrap{width:200px;}
+.scale-track{height:4px;background:var(--border);border-radius:100px;position:relative;margin-bottom:8px;}
+.scale-fill{height:4px;background:var(--primary);border-radius:100px;position:absolute;left:0;top:0;}
+.scale-dot{width:14px;height:14px;border-radius:50%;background:var(--primary);border:2px solid white;box-shadow:0 0 0 2px var(--primary);position:absolute;top:50%;transform:translate(-50%,-50%);}
+.scale-labels{display:flex;justify-content:space-between;}
+.scale-label{font-size:10px;color:var(--text-lt);font-weight:500;}
+.scale-label.active{color:var(--primary);font-weight:700;}
+
+/* Report sections */
+.report-section{margin-bottom:2rem;}
+.section-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:1rem;}
+.section-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-dk);margin-bottom:1rem;letter-spacing:-0.2px;}
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+.chart-legend{display:flex;gap:1.5rem;margin-bottom:1rem;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-lt);}
+.legend-solid{width:20px;height:2.5px;background:var(--primary);border-radius:2px;}
+.legend-dashed{width:20px;height:2px;background:repeating-linear-gradient(90deg,var(--text-lt) 0,var(--text-lt) 4px,transparent 4px,transparent 8px);}
+.chart-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:1.25rem;}
+.metric-item{text-align:center;padding:1rem;background:var(--surface);border-radius:12px;}
+.metric-val{font-family:'DM Serif Display',serif;font-size:24px;color:var(--primary);line-height:1;margin-bottom:3px;}
+.metric-label{font-size:11px;color:var(--text-lt);line-height:1.4;}
+.comp-rows{display:flex;flex-direction:column;gap:10px;}
+.comp-row{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;}
+.comp-cell{padding:14px 16px;font-size:13.5px;line-height:1.5;}
+.comp-cell-today{color:var(--text-lt);border-right:1px solid var(--border);}
+.comp-cell-today::before{content:"Now";display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-lt);font-weight:600;margin-bottom:3px;}
+.comp-cell-baskit{color:var(--text-dk);}
+.comp-cell-baskit::before{content:"With Baskit";display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:3px;}
+.comp-cell-baskit em{color:var(--primary);font-style:normal;font-weight:600;}
+.social-strip{display:flex;align-items:flex-start;gap:12px;padding:1.25rem;background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:2rem;}
+.sp-faces{display:flex;flex-shrink:0;}
+.sp-face{width:30px;height:30px;border-radius:50%;background:var(--primary-lt);border:2px solid var(--white);margin-right:-8px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--primary);}
+.sp-text{font-size:13px;color:var(--text-df);line-height:1.65;padding-left:6px;}
+.sp-text strong{color:var(--text-dk);font-weight:700;}
+.next-section{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:2rem;text-align:center;}
+.next-headline{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text-dk);margin-bottom:0.5rem;}
+.next-sub{font-size:14px;color:var(--text-df);line-height:1.7;margin-bottom:0.5rem;}
+.next-sub strong{color:var(--text-dk);}
+.next-italic{font-size:13px;color:var(--text-lt);font-style:italic;margin-bottom:1.5rem;}
+.btn-group{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-df);padding:12px 22px;border-radius:100px;font-size:14px;font-weight:600;font-family:'Open Sans',sans-serif;cursor:pointer;transition:all 0.2s;}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+.btn-cta{background:var(--primary);color:white;border:none;padding:12px 22px;border-radius:100px;font-size:14px;font-weight:700;font-family:'Open Sans',sans-serif;cursor:pointer;transition:background 0.2s;}
+.btn-cta:hover{background:#E67E00;}
+.report-footer{border-top:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;}
+.footer-copy{font-size:12px;color:var(--text-lt);}
+.footer-links{display:flex;gap:1.25rem;}
+.footer-link{font-size:12px;color:var(--text-lt);text-decoration:none;}
+.footer-link:hover{color:var(--primary);}
+
+/* CONTACT */
+.contact-page{background:transparent;padding:1.5rem;}
+.tabs-wrap{display:inline-flex;background:var(--surface);border-radius:100px;padding:4px;margin-bottom:1.75rem;}
+.tab{padding:8px 20px;border-radius:100px;font-size:13.5px;font-weight:500;cursor:pointer;transition:all 0.2s;color:var(--text-lt);border:none;background:none;font-family:'Open Sans',sans-serif;}
+.tab.active{background:var(--white);color:var(--primary);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.contact-grid{display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start;}
+/* Sidebar — dark green */
+.sidebar-card{background:var(--sidebar-bg);border-radius:16px;padding:1.5rem;}
+.sidebar-headline{font-family:'DM Serif Display',serif;font-size:18px;color:white;margin-bottom:0.5rem;line-height:1.3;}
+.sidebar-sub{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.65;margin-bottom:1.1rem;}
+.sidebar-bullets{display:flex;flex-direction:column;gap:7px;margin-bottom:1.25rem;}
+.sidebar-bullet{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;}
+.sidebar-check{color:var(--cyan);font-size:12px;flex-shrink:0;margin-top:2px;}
+.sidebar-btn{width:100%;background:var(--cyan);color:var(--sidebar-bg);border:none;padding:12px;border-radius:100px;font-size:14px;font-weight:700;font-family:'Open Sans',sans-serif;cursor:pointer;transition:opacity 0.2s;}
+.sidebar-btn:hover{opacity:0.85;}
+.sidebar-or{text-align:center;font-size:12px;color:rgba(255,255,255,0.3);margin-top:0.6rem;}
+/* Form */
+.form-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-lt);font-weight:700;margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'Open Sans',sans-serif;color:var(--text-dk);background:var(--white);outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--primary);}
+.form-input::placeholder{color:var(--text-lt);}
+.form-input.error{border-color:#E53E3E;}
+.form-textarea{resize:none;height:90px;}
+.form-stack{display:flex;flex-direction:column;gap:14px;}
+.checkbox-wrap{display:flex;align-items:flex-start;gap:10px;}
+.checkbox-wrap input[type=checkbox]{width:16px;height:16px;margin-top:2px;accent-color:var(--primary);flex-shrink:0;cursor:pointer;}
+.checkbox-label{font-size:13.5px;color:var(--text-df);line-height:1.5;}
+
+/* Mobile */
+@media(max-width:640px){
+  .contact-grid{grid-template-columns:1fr;}
+  .sidebar-card{display:none;}
+  .report-hero{grid-template-columns:1fr;text-align:center;}
+  .report-sub{max-width:100%;margin:0 auto;}
+  .report-hero-right{margin:0 auto;}
+  .chart-metrics{grid-template-columns:1fr;}
+  .btn-group{flex-direction:column;}
+  .btn-ghost,.btn-cta{width:100%;text-align:center;}
+  .report-footer{flex-direction:column;align-items:flex-start;}
+  .comp-row{grid-template-columns:1fr;}
+  .comp-cell-today{border-right:none;border-bottom:1px solid var(--border);}
+  .scale-bar-wrap{width:100%;max-width:240px;}
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE NAV -->
+<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:999;background:white;padding:5px 10px;border-radius:100px;box-shadow:0 2px 12px rgba(0,0,0,0.12);border:1px solid #E2DDD5;">
+  <button onclick="showPage('page-q')" style="font-size:11px;padding:4px 10px;border-radius:100px;border:none;cursor:pointer;background:#FF8B00;color:white;font-weight:600;">Assessment</button>
+  <button onclick="showPage('page-loading')" style="font-size:11px;padding:4px 10px;border-radius:100px;border:1px solid #E2DDD5;cursor:pointer;background:white;color:#4C4F59;">Loading</button>
+  <button onclick="showPage('page-gate')" style="font-size:11px;padding:4px 10px;border-radius:100px;border:1px solid #E2DDD5;cursor:pointer;background:white;color:#4C4F59;">Gate</button>
+  <button onclick="showPage('page-report')" style="font-size:11px;padding:4px 10px;border-radius:100px;border:1px solid #E2DDD5;cursor:pointer;background:white;color:#4C4F59;">Report</button>
+  <button onclick="showPage('page-contact')" style="font-size:11px;padding:4px 10px;border-radius:100px;border:1px solid #E2DDD5;cursor:pointer;background:white;color:#4C4F59;">Contact</button>
+</div>
+
+<!-- ═══ ASSESSMENT ═══ -->
+<div id="page-q" class="page active">
+  <nav class="assess-nav">
+    <div class="logo">b<em>.</em>askit</div>
+    <div class="lang-switch">
+      <button class="lang-btn active">EN</button>
+      <span class="lang-divider">|</span>
+      <button class="lang-btn">ID</button>
+    </div>
+  </nav>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span class="progress-label">Question 1 of 5</span>
+      <span class="progress-label">20%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill" style="width:20%"></div>
+    </div>
+  </div>
+
+  <div class="q-outer">
+    <div class="q-inner">
+      <div class="q-screen">
+        <p class="q-num">Question 1</p>
+        <h2 class="q-text" id="q-text">What margin can you offer to your distributor?</h2>
+        <div class="options" id="options-wrap"></div>
+        <div class="feedback-wrap" id="feedback-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-wrap">
+    <div class="next-inner">
+      <button class="btn-next" id="btn-next" disabled onclick="nextQ()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LOADING ═══ -->
+<div id="page-loading" class="page">
+  <nav class="assess-nav">
+    <div class="logo">b<em>.</em>askit</div>
+    <div class="lang-switch">
+      <button class="lang-btn active">EN</button>
+      <span class="lang-divider">|</span>
+      <button class="lang-btn">ID</button>
+    </div>
+  </nav>
+  <div class="loading-page">
+    <div class="loading-top">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 120 120">
+          <path class="ring-track" d="M 15 105 A 52 52 0 0 1 105 105" fill="none"/>
+          <path class="ring-glow"  d="M 15 105 A 52 52 0 0 1 105 105" fill="none" stroke-dasharray="314" stroke-dashoffset="80"/>
+          <path class="ring-fill"  d="M 15 105 A 52 52 0 0 1 105 105" fill="none" stroke-dasharray="314" stroke-dashoffset="80"/>
+        </svg>
+        <div class="ring-num-wrap">
+          <div class="ring-num">74</div>
+          <div class="ring-pct">%</div>
+        </div>
+      </div>
+      <p class="loading-msg">Building your <em>personalized report</em>...</p>
+    </div>
+    <div class="testi-section">
+      <p class="testi-label">What brands say about Baskit</p>
+      <div class="testi-card">
+        <div class="testi-quote-mark">"</div>
+        <p class="testi-text">I've been building this brand since way before it became a trend. But turning that into a scalable business needed more than just a product. Baskit helped me do both. What they do is more than just distribution, it's about bringing brands to life.</p>
+        <div class="testi-person">
+          <div class="testi-avatar">SW</div>
+          <div>
+            <p class="testi-name">Senwi Wandy</p>
+            <p class="testi-role">Director, Panca Tobacco</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GATE ═══ -->
+<div id="page-gate" class="page">
+  <nav class="assess-nav">
+    <div class="logo">b<em>.</em>askit</div>
+    <div class="lang-switch">
+      <button class="lang-btn active">EN</button>
+      <span class="lang-divider">|</span>
+      <button class="lang-btn">ID</button>
+    </div>
+  </nav>
+  <div class="gate-page">
+    <div class="gate-inner">
+      <p class="gate-eyebrow">Your personalized report is ready</p>
+      <h2 class="gate-headline">Fill in your details<br>to see your report.</h2>
+      <p class="gate-sub">Your Distribution Readiness Report is ready. Enter your information below and you'll see your full results immediately.</p>
+      <div class="gate-tags">
+        <span class="gate-tag">📊 Readiness score</span>
+        <span class="gate-tag">🔍 Growth gaps</span>
+        <span class="gate-tag">📈 Baskit potential</span>
+        <span class="gate-tag">🗺️ Path forward</span>
+      </div>
+      <div class="gate-divider"></div>
+      <div class="form-stack">
+        <div class="field-wrap">
+          <label class="field-label">Brand Name <span class="field-req">*</span></label>
+          <input class="field-input" type="text" placeholder="Your brand name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Brand Category <span class="field-req">*</span></label>
+          <div class="select-wrap">
+            <select class="field-input">
+              <option value="">Select a category</option>
+              <option>FMCG</option>
+              <option>Beauty & Personal Care</option>
+              <option>Others</option>
+            </select>
+            <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Organization Name <span class="field-req">*</span></label>
+          <input class="field-input" type="text" placeholder="Organization Name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">PIC Name <span class="field-req">*</span></label>
+          <input class="field-input" type="text" placeholder="PIC Name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">WhatsApp / Phone <span class="field-req">*</span></label>
+          <input class="field-input" type="tel" placeholder="+62 8xx xxxx xxxx"/>
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Email</label>
+          <input class="field-input" type="email" placeholder="you@brand.com"/>
+        </div>
+        <button class="btn-primary" onclick="showPage('page-report')">See my report →</button>
+        <p class="privacy-note">🔒 Your information is safe with us. We'll never share it.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REPORT ═══ -->
+<div id="page-report" class="page">
+  <div class="report-page">
+    <nav class="report-nav">
+      <div class="logo">b<em>.</em>askit</div>
+      <div class="lang-switch">
+        <button class="lang-btn active">EN</button>
+        <span class="lang-divider">|</span>
+        <button class="lang-btn">ID</button>
+      </div>
+    </nav>
+    <div class="report-body">
+
+      <!-- Hero: 2 col — headline left, gauge right -->
+      <div class="report-hero">
+        <div class="report-hero-left">
+          <p class="report-eyebrow">Distribution Ready</p>
+          <h1 class="report-headline">You're running at<br>full potential.</h1>
+          <p class="report-sub">Strong fundamentals across volume, margin, and readiness. The opportunity now is consolidating your distribution and removing the cost drag that's quietly compounding.</p>
+        </div>
+        <div class="report-hero-right">
+          <div class="gauge-svg-wrap">
+            <svg class="gauge-svg" viewBox="0 0 200 120">
+              <path fill="none" stroke="#E2DDD5" stroke-width="10" stroke-linecap="round" d="M 20 110 A 85 85 0 0 1 180 110"/>
+              <path fill="none" stroke="#FF8B00" stroke-width="20" stroke-linecap="round" opacity="0.12" stroke-dasharray="267" stroke-dashoffset="40" d="M 20 110 A 85 85 0 0 1 180 110"/>
+              <path fill="none" stroke="#FF8B00" stroke-width="10" stroke-linecap="round" stroke-dasharray="267" stroke-dashoffset="40" d="M 20 110 A 85 85 0 0 1 180 110"/>
+              <circle cx="167" cy="47" r="6" fill="#FF8B00"/>
+            </svg>
+            <div class="gauge-num-wrap">
+              <span class="gauge-num">88</span><span class="gauge-denom">/100</span>
+            </div>
+          </div>
+          <div class="gauge-badge">Distribution-Ready</div>
+          <div class="scale-bar-wrap">
+            <div class="scale-track">
+              <div class="scale-fill" style="width:85%"></div>
+              <div class="scale-dot" style="left:85%"></div>
+            </div>
+            <div class="scale-labels">
+              <span class="scale-label">Early Stage</span>
+              <span class="scale-label">Scaling</span>
+              <span class="scale-label active">Expansion Ready</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Potential chart -->
+      <div class="report-section">
+        <p class="section-label">Potential with Baskit</p>
+        <div class="chart-card">
+          <p class="section-title" style="margin-bottom:0.75rem;">Here's what brands like yours typically achieve.</p>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-solid"></div>With Baskit</div>
+            <div class="legend-item"><div class="legend-dashed"></div>Without Baskit</div>
+          </div>
+          <svg viewBox="0 0 400 160" style="width:100%;height:auto;display:block;">
+            <defs>
+              <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FF8B00" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#FF8B00" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M 0 150 Q 100 130 200 90 Q 300 50 400 20 L 400 160 L 0 160 Z" fill="url(#cg)"/>
+            <path d="M 0 150 Q 100 130 200 90 Q 300 50 400 20" fill="none" stroke="#FF8B00" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M 0 150 Q 200 148 400 138" fill="none" stroke="#9B9CA1" stroke-width="1.5" stroke-dasharray="6,4"/>
+            <circle cx="0" cy="150" r="4" fill="#FF8B00"/>
+            <circle cx="200" cy="90" r="4" fill="#FF8B00" opacity="0.7"/>
+            <circle cx="400" cy="20" r="5" fill="#FF8B00"/>
+            <circle cx="400" cy="138" r="4" fill="#9B9CA1"/>
+            <text x="4" y="175" font-size="11" fill="#9B9CA1" font-family="Open Sans">Now</text>
+            <text x="178" y="175" font-size="11" fill="#9B9CA1" font-family="Open Sans">3 Months</text>
+            <text x="362" y="175" font-size="11" fill="#9B9CA1" font-family="Open Sans">6 Months</text>
+          </svg>
+          <div class="chart-metrics">
+            <div class="metric-item"><div class="metric-val">2–4×</div><div class="metric-label">Outlet Reach<br>potential</div></div>
+            <div class="metric-item"><div class="metric-val">2–3×</div><div class="metric-label">Activation Speed<br>faster</div></div>
+            <div class="metric-item"><div class="metric-val">20–35%</div><div class="metric-label">Cost Efficiency<br>improvement</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison -->
+      <div class="report-section">
+        <p class="section-label">Now vs. with Baskit</p>
+        <div class="comp-rows">
+          <div class="comp-row">
+            <div class="comp-cell comp-cell-today">Fragmented distributor coordination</div>
+            <div class="comp-cell comp-cell-baskit"><em>Centralized</em> distribution infrastructure</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-cell comp-cell-today">Sell-out data arrives days or weeks late</div>
+            <div class="comp-cell comp-cell-baskit"><em>Real-time visibility</em> per outlet and SKU</div>
+          </div>
+          <div class="comp-row">
+            <div class="comp-cell comp-cell-today">Merchandising hard to audit at scale</div>
+            <div class="comp-cell comp-cell-baskit"><em>Scalable execution</em> across all channels</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social proof -->
+      <div class="social-strip">
+        <div class="sp-faces">
+          <div class="sp-face">ML</div>
+          <div class="sp-face">SW</div>
+          <div class="sp-face">AR</div>
+          <div class="sp-face">+</div>
+        </div>
+        <p class="sp-text">High-volume brands that consolidated under Baskit typically reduce distribution inefficiency by <strong>20–35%</strong> within 6 months while improving <strong>outlet coverage</strong> simultaneously.</p>
+      </div>
+
+      <!-- What happens next -->
+      <div class="next-section">
+        <h2 class="next-headline">What happens next.</h2>
+        <p class="next-sub">We've received your results and will review them shortly. If it's a fit, our team will reach out within <strong>7 business days.</strong></p>
+        <p class="next-italic">Don't want to wait? Reach out to our team directly — we'd love to talk.</p>
+        <div class="btn-group">
+          <button class="btn-ghost">Back to Homepage</button>
+          <button class="btn-cta">Schedule a Meeting →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-footer">
+      <span class="footer-copy">Copyright © 2024 Baskit Pte. Ltd.</span>
+      <div class="footer-links">
+        <a class="footer-link" href="#">Term & Condition</a>
+        <a class="footer-link" href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONTACT ═══ -->
+<div id="page-contact" class="page">
+  <div class="contact-page">
+
+    <!-- Pill tabs -->
+    <div class="tabs-wrap">
+      <button class="tab active" onclick="switchTab('brand',this)">Brand</button>
+      <button class="tab" onclick="switchTab('distributor',this)">Distributor</button>
+      <button class="tab" onclick="switchTab('others',this)">Others</button>
+    </div>
+
+    <!-- BRAND TAB -->
+    <div id="tab-brand" class="contact-grid">
+      <div class="form-stack">
+        <div class="field-wrap">
+          <label class="form-label">Brand Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Your brand name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Brand Category <span class="field-req">*</span></label>
+          <div class="select-wrap">
+            <select class="form-input">
+              <option value="">Select a category</option>
+              <option>FMCG</option><option>BPC</option><option>Others</option>
+            </select>
+            <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Organization Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Your organization or company name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">PIC Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Person in charge name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">WhatsApp / Phone <span class="field-req">*</span></label>
+          <input class="form-input" type="tel" placeholder="+62 8xx xxxx xxxx"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Email <span class="field-req">*</span></label>
+          <input class="form-input" type="email" placeholder="you@brand.com"/>
+        </div>
+        <button class="btn-primary">Send message →</button>
+      </div>
+      <div class="sidebar-card">
+        <h3 class="sidebar-headline">Not sure how your brand can grow?</h3>
+        <p class="sidebar-sub">Take the quick brand assessment and get a personalized recommendation before talking to our team.</p>
+        <div class="sidebar-bullets">
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>See your distribution readiness score</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Know which Baskit solution fits you</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Get a directional growth estimate</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Only 5 questions — takes 2 minutes</div>
+        </div>
+        <button class="sidebar-btn">Take the Assessment →</button>
+        <p class="sidebar-or">or just fill the form on the left</p>
+      </div>
+    </div>
+
+    <!-- DISTRIBUTOR TAB -->
+    <div id="tab-distributor" class="contact-grid" style="display:none;">
+      <div class="form-stack">
+        <div class="field-wrap">
+          <label class="form-label">Distributor Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Your distributor or company name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">PIC Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Person in charge name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">WhatsApp / Phone <span class="field-req">*</span></label>
+          <input class="form-input" type="tel" placeholder="+62 8xx xxxx xxxx"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Email <span class="field-req">*</span></label>
+          <input class="form-input" type="email" placeholder="you@company.com"/>
+        </div>
+        <button class="btn-primary">Send message →</button>
+      </div>
+      <div class="sidebar-card">
+        <h3 class="sidebar-headline">Not sure how to grow your distribution business?</h3>
+        <p class="sidebar-sub">Tell us about your distribution network and we'll explore how Baskit can work with you.</p>
+        <div class="sidebar-bullets">
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Access to 50+ active brand partners</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Shared logistics and last-mile infrastructure</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Real-time sell-out data across channels</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Embedded financing for your network</div>
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-top:0.25rem;">Fill in the form and our team will reach out within 1 business day.</p>
+      </div>
+    </div>
+
+    <!-- OTHERS TAB -->
+    <div id="tab-others" class="contact-grid" style="display:none;">
+      <div class="form-stack">
+        <div class="field-wrap">
+          <label class="form-label">Full Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Your name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Brand / Company Name <span class="field-req">*</span></label>
+          <input class="form-input" type="text" placeholder="Company name"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Email <span class="field-req">*</span></label>
+          <input class="form-input" type="email" placeholder="you@company.com"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Phone / WhatsApp <span class="field-req">*</span></label>
+          <input class="form-input" type="tel" placeholder="+62 8xx xxxx xxxx"/>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">How did you hear about us? <span class="field-req">*</span></label>
+          <div class="select-wrap">
+            <select class="form-input">
+              <option value="">Select an option</option>
+              <option>Search Engine (Google, etc.)</option>
+              <option>Social Media</option>
+              <option>Referral</option>
+              <option>Event, PR, Webinar</option>
+              <option>Other</option>
+            </select>
+            <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">How can we help you? <span class="field-req">*</span></label>
+          <div class="select-wrap">
+            <select class="form-input">
+              <option value="">Select an option</option>
+              <option>General Inquiry</option>
+              <option>Request a Demo</option>
+              <option>Sales or Product Question</option>
+              <option>Customer Support</option>
+              <option>Technical Assistance</option>
+              <option>Partnership Opportunities</option>
+            </select>
+            <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">Business Size <span class="field-req">*</span></label>
+          <div class="select-wrap">
+            <select class="form-input">
+              <option value="">Select an option</option>
+              <option>Small Business (1–10 employees)</option>
+              <option>Medium Business (11–50 employees)</option>
+              <option>Large Business (51–200 employees)</option>
+              <option>Enterprise (200+ employees)</option>
+            </select>
+            <svg class="select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="field-wrap">
+          <label class="form-label">What is your intention working with Baskit? <span class="field-req">*</span></label>
+          <textarea class="form-input form-textarea" placeholder="Share what you aim to do or explore with Baskit, whether it's collaboration, partnership or something else"></textarea>
+        </div>
+        <div class="checkbox-wrap">
+          <input type="checkbox"/>
+          <label class="checkbox-label">I agree to receive other communication from Baskit Team</label>
+        </div>
+        <div class="checkbox-wrap">
+          <input type="checkbox"/>
+          <label class="checkbox-label">I am the decision maker in business partnership or software purchase</label>
+        </div>
+        <button class="btn-primary">Send message →</button>
+      </div>
+      <div class="sidebar-card">
+        <h3 class="sidebar-headline">Not sure how your business can grow?</h3>
+        <p class="sidebar-sub">Tell us what you're looking for and our team will find the best way Baskit can help.</p>
+        <div class="sidebar-bullets">
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Access to nationwide distribution infrastructure</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Embedded financing and cash flow solutions</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Real-time data and channel visibility</div>
+          <div class="sidebar-bullet"><span class="sidebar-check">✓</span>Flexible partnerships for any stage</div>
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-top:0.25rem;">Fill in the form and our team will reach out within 1 business day.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Page navigation ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+  window.scrollTo(0,0)
+}
+
+// ── Contact tabs ──
+function switchTab(name, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('tab-brand').style.display='none'
+  document.getElementById('tab-distributor').style.display='none'
+  document.getElementById('tab-others').style.display='none'
+  document.getElementById('tab-'+name).style.display='grid'
+}
+
+// ── Assessment questions + dynamic feedback ──
+const QUESTIONS = [
+  {
+    text: "What margin can you offer to your distributor?",
+    opts: ["More than 40%","25–39%","15–24%","5–14%","Less than 5%"],
+    feedback: [
+      {icon:"💪",title:"Excellent margin.",msg:"Distributors will compete for your product. You have real channel leverage."},
+      {icon:"✅",title:"Competitive margin.",msg:"You have room to negotiate terms with distributors."},
+      {icon:"⚠️",title:"Tight margin.",msg:"Baskit's shared logistics cost can help make this work."},
+      {icon:"🔧",title:"Thin margin.",msg:"Channel economics need to be addressed before scaling."},
+      {icon:"🚨",title:"Critical margin.",msg:"This is the first thing to work through together."}
+    ]
+  },
+  {
+    text: "How many days of payment terms (TOP) can you offer to distributors?",
+    opts: ["3–7 days","8–14 days","15–21 days","21–30 days","More than 30 days"],
+    feedback: [
+      {icon:"⚡",title:"Short terms.",msg:"Too tight for most distributors. Longer terms open more doors."},
+      {icon:"👍",title:"Acceptable terms.",msg:"A little more flexibility would open more doors."},
+      {icon:"✅",title:"Good terms.",msg:"Most distributors work comfortably in this range."},
+      {icon:"🎯",title:"Sweet spot.",msg:"Exactly what most distributors look for."},
+      {icon:"💰",title:"Generous terms.",msg:"Attracts distributors but ties up cash flow. Baskit's financing solves this."}
+    ]
+  },
+  {
+    text: "How quickly can your team respond to new business opportunities?",
+    opts: ["Same day","1–2 days","3–5 business days","1–2 weeks","Longer than 2 weeks"],
+    feedback: [
+      {icon:"⚡",title:"Highly agile.",msg:"Same-day response is a real competitive advantage."},
+      {icon:"✅",title:"Good agility.",msg:"Fast enough to capture important opportunities."},
+      {icon:"🔄",title:"Moderate speed.",msg:"Some fast-moving opportunities may need quicker turnaround."},
+      {icon:"🐢",title:"Slower cadence.",msg:"Worth streamlining your decision process."},
+      {icon:"🔧",title:"Response lag.",msg:"Creates friction with distribution partners."}
+    ]
+  },
+  {
+    text: "How ready is your brand for retail expansion in Indonesia?",
+    opts: ["Fully ready","Mostly ready","Partially ready","Limited readiness","Not ready yet"],
+    feedback: [
+      {icon:"🏆",title:"Fully ready.",msg:"Zero barriers to activation. You can move fast from day one."},
+      {icon:"✅",title:"Almost there.",msg:"Minor gaps won't slow things down much."},
+      {icon:"🔧",title:"Getting there.",msg:"The right support closes these gaps faster than going alone."},
+      {icon:"🌱",title:"Building readiness.",msg:"With the right guidance, brands get retail-ready faster than expected."},
+      {icon:"💡",title:"Early stage.",msg:"What matters is having the right partner to guide the journey."}
+    ]
+  },
+  {
+    text: "How many units does your brand sell per month?",
+    opts: ["More than 10,000","5,000–10,000","3,000–4,999","1,000–2,999","Less than 1,000"],
+    feedback: [
+      {icon:"🚀",title:"Strong traction.",msg:"Distributors will prioritize your brand. You have real leverage."},
+      {icon:"📈",title:"Solid volume.",msg:"The right infrastructure can multiply this fast."},
+      {icon:"🌱",title:"Growing stage.",msg:"The right channels now will compound this significantly."},
+      {icon:"🔑",title:"Early traction.",msg:"Distribution infrastructure is the next unlock."},
+      {icon:"💡",title:"Building momentum.",msg:"Early stage is the right time to build the right foundation."}
+    ]
+  }
+]
+
+let currentQ = 0
+let selected = null
+
+function renderQ(){
+  const q = QUESTIONS[currentQ]
+  const pct = Math.round(((currentQ+1)/QUESTIONS.length)*100)
+  document.getElementById('prog-fill').style.width = pct+'%'
+  document.querySelector('.progress-meta .progress-label:first-child').textContent = `Question ${currentQ+1} of ${QUESTIONS.length}`
+  document.querySelector('.progress-meta .progress-label:last-child').textContent = pct+'%'
+  document.querySelector('.q-num').textContent = `Question ${currentQ+1}`
+  document.getElementById('q-text').textContent = q.text
+  const wrap = document.getElementById('options-wrap')
+  wrap.innerHTML = q.opts.map((o,i)=>`<button class="option" onclick="pickOpt(${i})">${o}</button>`).join('')
+  document.getElementById('feedback-wrap').innerHTML = ''
+  document.getElementById('btn-next').disabled = true
+  selected = null
+}
+
+function pickOpt(i){
+  selected = i
+  document.querySelectorAll('.option').forEach((b,idx)=>b.classList.toggle('selected',idx===i))
+  document.getElementById('btn-next').disabled = false
+  const f = QUESTIONS[currentQ].feedback[i]
+  document.getElementById('feedback-wrap').innerHTML = `
+    <div class="feedback-card">
+      <span class="feedback-icon">${f.icon}</span>
+      <div>
+        <p class="feedback-title">${f.title}</p>
+        <p class="feedback-msg">${f.msg}</p>
+      </div>
+    </div>`
+}
+
+function nextQ(){
+  if(selected===null) return
+  if(currentQ < QUESTIONS.length-1){
+    currentQ++; selected=null; renderQ()
+  } else {
+    showPage('page-loading')
+  }
+}
+
+renderQ()
+</script>
+</body>
+</html>
