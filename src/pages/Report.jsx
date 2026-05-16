@@ -5,6 +5,8 @@ import ComparisonRows from '../components/ComparisonRows'
 import { useLang } from '../context/LangContext'
 import { getScoreLabel } from '../lib/scoring'
 import { profiles } from '../lib/profiles'
+import { useRef, useState } from 'react'
+import { Download } from 'lucide-react'
 
 const TERMS_URL = 'https://baskit.app/term-condition'
 const PRIVACY_URL = 'https://baskit.app/privacy-policy'
@@ -16,9 +18,68 @@ export default function Report({ score, profile }) {
   const profileContent = profiles[profile]?.[lang] ?? profiles.default[lang]
   const scoreLabel = getScoreLabel(score, t)
 
+  const reportRef = useRef(null)
+  const [downloading, setDownloading] = useState(false)
+
+  function loadHtml2Pdf() {
+    if (window.html2pdf) return Promise.resolve(window.html2pdf)
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script')
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js'
+      s.onload = () => {
+        if (window.html2pdf) resolve(window.html2pdf)
+        else reject(new Error('html2pdf failed to load'))
+      }
+      s.onerror = () => reject(new Error('Failed to load html2pdf script'))
+      document.head.appendChild(s)
+    })
+  }
+
+  async function downloadReport() {
+    if (!reportRef.current) return
+    setDownloading(true)
+    try {
+      const html2pdf = await loadHtml2Pdf()
+      const opt = {
+        margin: 12,
+        filename: 'baskit-assessment-report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+      }
+      await html2pdf().set(opt).from(reportRef.current).save()
+    } catch (err) {
+      console.warn('[Report] PDF export error:', err)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 max-w-[850px] mx-auto w-full px-6 pt-10 pb-16">
+
+        <div className="relative mb-4">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={downloadReport}
+              disabled={downloading}
+              title="Download Report"
+              aria-label="Download Report"
+              className="rounded-full p-2 bg-transparent border border-[#E8DDD0] hover:bg-[#F3E8DA] transition-colors flex items-center justify-center"
+              style={{ backgroundColor: 'transparent' }}
+            >
+              {downloading ? (
+                <span className="w-4 h-4 border-2 border-[#5B4A3B] border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Download size={16} color="#5B4A3B" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div ref={reportRef}>
 
         {/* Hero — 2 columns desktop, stacked mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
@@ -106,6 +167,8 @@ export default function Report({ score, profile }) {
             </a>
           </div>
         </div>
+        </div>
+
       </div>
 
       {/* Footer */}
