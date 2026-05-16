@@ -151,7 +151,7 @@ export default function Report({ score, profile }) {
         <div className="bg-[#00312F] border border-[#E2DDD5] rounded-2xl p-8 text-left  mb-8">
           <h2 className="font-sans font-semibold text-[26px] text-white mb-2">{t('next_steps_headline')}</h2>
           <p
-            className="text-sm text-[#e2ddd5e9] lineHeight: '1.65' }} leading-[1.7] mb-2"
+            className="text-sm text-[#e2ddd5e9] leading-[1.7] mb-2"
             dangerouslySetInnerHTML={{ __html: t('next_steps_sub') }}
           />
           <p className="text-[13px] text-[#969696df] italic mb-6">{t('next_steps_italic')}</p>
