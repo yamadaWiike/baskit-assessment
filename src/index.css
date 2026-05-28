@@ -35,3 +35,58 @@ body {
   width: 100%;
   min-height: 100dvh;
 }
+
+@media print {
+  /* Hide everything that shouldn't be in PDF */
+  .no-print,
+  nav,
+  footer,
+  .pdf-exclude {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  /* Reset backgrounds */
+  body,
+  html {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Make sure colors print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Full width on print */
+  .max-w-\[850px\] {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* SVG must be visible */
+  svg {
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  /* Avoid breaking inside sections */
+  .mb-8,
+  .mb-10 {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Hide language switcher and navbar */
+  .lang-switcher,
+  [class*="lang"] {
+    display: none !important;
+  }
+}

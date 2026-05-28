@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import TabSwitcher from '../components/TabSwitcher'
 import FormField from '../components/FormField'
+import PhoneField from '../components/PhoneField'
 import Sidebar from '../components/Sidebar'
-import LanguageSwitcher from '../components/LanguageSwitcher'
 import { useLang } from '../context/LangContext'
 import { submitContact } from '../lib/submit'
 
@@ -29,6 +29,7 @@ function BrandTab() {
     if (!form.orgName.trim()) e.orgName = 'Required'
     if (!form.picName.trim()) e.picName = 'Required'
     if (!form.whatsapp.trim()) e.whatsapp = 'Required'
+    if (!form.email.trim()) e.email = 'Required'
     return e
   }
 
@@ -66,9 +67,8 @@ function BrandTab() {
       <FormField label={t('field_brand_category')} type="select" value={form.brandCategory} onChange={set('brandCategory')} error={errors.brandCategory} required options={catOptions} placeholder={t('select_placeholder')} />
       <FormField label={t('field_org_name')} value={form.orgName} onChange={set('orgName')} error={errors.orgName} required />
       <FormField label={t('field_pic_name')} value={form.picName} onChange={set('picName')} error={errors.picName} required />
-      <FormField label={t('field_whatsapp')} type="tel" value={form.whatsapp} onChange={(value) => { const sanitizedValue = value.replace(/\D/g, "") 
-        set("whatsapp")(sanitizedValue) }} error={errors.whatsapp} required />
-      <FormField label={t('field_email')} type="email" value={form.email} onChange={set('email')} />
+      <PhoneField label={t('field_whatsapp')} value={form.whatsapp} onChange={set('whatsapp')} error={errors.whatsapp} required />
+      <FormField label={t('field_email')} type="email" value={form.email} onChange={set('email')} error={errors.email} required />
       <button type="submit" disabled={submitting} className="w-full bg-[#FF8B00] text-white font-semibold rounded-full px-6 py-3 hover:bg-[#FF9F2E] transition disabled:opacity-60 cursor-pointer">
         {t('contact_cta')}
       </button>
@@ -118,8 +118,7 @@ function DistributorTab() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <FormField label={t('field_distributor_name')} value={form.distName} onChange={set('distName')} error={errors.distName} required />
       <FormField label={t('field_pic_name')} value={form.picName} onChange={set('picName')} error={errors.picName} required />
-      <FormField label={t('field_whatsapp')} type="tel" value={form.whatsapp} onChange={(value) => { const sanitizedValue = value.replace(/\D/g, "")
-        set("whatsapp")(sanitizedValue)}} error={errors.whatsapp} required />
+      <PhoneField label={t('field_whatsapp')} value={form.whatsapp} onChange={set('whatsapp')} error={errors.whatsapp} required />
       <FormField label={t('field_email_required')} type="email" value={form.email} onChange={set('email')} error={errors.email} required />
       <button type="submit" disabled={submitting} className="w-full bg-[#FF8B00] text-white font-semibold rounded-full px-6 py-3 hover:bg-[#FF9F2E] transition disabled:opacity-60 cursor-pointer">
         {t('contact_cta')}
@@ -209,8 +208,7 @@ function OthersTab() {
       <FormField label={t('field_full_name')} value={form.fullName} onChange={set('fullName')} error={errors.fullName} required />
       <FormField label={t('field_company_name')} value={form.company} onChange={set('company')} error={errors.company} required />
       <FormField label={t('field_email_required')} type="email" value={form.email} onChange={set('email')} error={errors.email} required />
-      <FormField label={t('field_phone')} type="tel" value={form.phone} onChange={(value) => { const sanitizedValue = value.replace(/\D/g, "")
-        set("phone")(sanitizedValue) }} error={errors.phone} required />
+      <PhoneField label={t('field_phone')} value={form.phone} onChange={set('phone')} error={errors.phone} required />
       <FormField label={t('field_how_heard')} type="select" value={form.howHeard} onChange={set('howHeard')} error={errors.howHeard} required options={howHeardOpts} placeholder={t('select_placeholder')} />
       <FormField label={t('field_how_help')} type="select" value={form.howHelp} onChange={set('howHelp')} error={errors.howHelp} required options={howHelpOpts} placeholder={t('select_placeholder')} />
       <FormField label={t('field_biz_size')} type="select" value={form.bizSize} onChange={set('bizSize')} error={errors.bizSize} required options={bizSizeOpts} placeholder={t('select_placeholder')} />
@@ -308,7 +306,7 @@ export default function Contact() {
       </div>
 
       <div className="px-5 pb-8 max-w-3xl mx-auto w-full">
-        <div className="flex gap-10 items-center">
+        <div className="flex flex-col gap-8 md:flex-row md:gap-10 md:items-center">
           {/* Main form */}
           <div className="flex-1 min-w-0">
             <TabSwitcher tabs={tabs} active={activeTab} onChange={setActiveTab} />

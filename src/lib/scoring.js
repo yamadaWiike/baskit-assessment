@@ -3,7 +3,7 @@
 
 const RAW_VALUES = {
   margin:    [5, 4, 3, 2, 1],
-  top:       [2, 3, 4, 5, 3], // non-linear: 21-30 days is best
+  top:       [5, 4, 3, 2, 1],
   agility:   [5, 4, 3, 2, 1],
   readiness: [5, 4, 3, 2, 1],
   vol:       [5, 4, 3, 2, 1],

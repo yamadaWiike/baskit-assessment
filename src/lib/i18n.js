@@ -14,14 +14,15 @@ export const strings = {
     q1_c: '15–24%',
     q1_d: '5–14%',
     q1_e: 'Less than 5%',
+  
 
     // Assessment — Q2
     q2_text: 'What payment terms (TOP) can you offer to distributors?',
-    q2_a: '3–7 days',
+    q2_a: 'More than 60 days',
     q2_b: '8–14 days',
     q2_c: '15–21 days',
     q2_d: '21–30 days',
-    q2_e: 'More than 30 days',
+    q2_e: '0 days',
 
     // Assessment — Q3
     q3_text: 'How quickly can your team respond to new business opportunities?',
@@ -130,7 +131,7 @@ export const strings = {
     field_org_name: 'Organization Name',
     field_pic_name: 'PIC Name',
     field_whatsapp: 'WhatsApp / Phone Number',
-    field_email: 'Email (optional)',
+    field_email: 'Email',
     field_email_required: 'Email',
     cat_fmcg: 'FMCG',
     cat_bpc: 'Beauty & Personal Care',
@@ -227,7 +228,7 @@ export const strings = {
     sidebar_brand_b2: 'Know which Baskit solution fits you',
     sidebar_brand_b3: 'Get a directional growth estimate',
     sidebar_brand_b4: 'Only 5 questions — takes 2 minutes',
-    sidebar_brand_note: 'or just fill the form on the left',
+    sidebar_brand_note: 'or just fill the form',
 
     contact_sidebar_dist_q: 'Not sure how to grow your distribution business?',
     sidebar_dist_sub: "Tell us about your distribution network and we'll explore how Baskit can work with you.",
@@ -262,11 +263,11 @@ export const strings = {
     q1_e: 'Kurang dari 5%',
 
     q2_text: 'Berapa hari terms of payment (TOP) yang bisa kamu tawarkan ke distributor?',
-    q2_a: '3–7 hari',
-    q2_b: '8–14 hari',
-    q2_c: '15–21 hari',
-    q2_d: '21–30 hari',
-    q2_e: 'Lebih dari 30 hari',
+    q2_a: 'Lebih dari 60 hari',
+    q2_b: '30-45 hari',
+    q2_c: '21 hari',
+    q2_d: '7-14 hari',
+    q2_e: '0 hari',
 
     q3_text: 'Seberapa cepat tim kamu bisa merespons peluang bisnis baru?',
     q3_a: 'Hari yang sama',
@@ -369,7 +370,7 @@ export const strings = {
     field_org_name: 'Nama Organisasi',
     field_pic_name: 'Nama PIC',
     field_whatsapp: 'WhatsApp / Nomor HP',
-    field_email: 'Email (opsional)',
+    field_email: 'Email',
     field_email_required: 'Email',
     cat_fmcg: 'FMCG',
     cat_bpc: 'Kecantikan & Perawatan Diri',
@@ -464,7 +465,7 @@ export const strings = {
     sidebar_brand_b2: 'Ketahui solusi Baskit yang tepat untukmu',
     sidebar_brand_b3: 'Dapatkan estimasi pertumbuhan arahmu',
     sidebar_brand_b4: 'Hanya 5 pertanyaan — hanya 2 menit',
-    sidebar_brand_note: 'atau isi saja formulir di sebelah kiri',
+    sidebar_brand_note: 'atau isi saja formulir',
 
     contact_sidebar_dist_q: 'Tidak yakin bagaimana mengembangkan bisnis distribusi kamu?',
     sidebar_dist_sub: 'Ceritakan tentang jaringan distribusimu dan kami akan menjajaki bagaimana Baskit bisa bekerja sama denganmu.',

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import FormField from '../components/FormField'
+import PhoneField from '../components/PhoneField'
 import { useLang } from '../context/LangContext'
 import { submitAssessment, submitGate } from '../lib/submit'
 import { BarChart3, TrendingUp, Sparkles, Compass } from "lucide-react"
@@ -28,6 +29,7 @@ export default function Gate({ answers, score, profile, onComplete }) {
     if (!form.orgName.trim()) e.orgName = 'Required'
     if (!form.picName.trim()) e.picName = 'Required'
     if (!form.whatsapp.trim()) e.whatsapp = 'Required'
+    if (!form.email.trim()) e.email = 'Required'
     return e
   }
 
@@ -46,21 +48,16 @@ async function handleSubmit(e) {
   setSubmitting(true)
   try {
     // 1. Submit assessment answers only
-    const assessmentId = await submitAssessment(
-      answers.map((idx, qIdx) => {
-        const OPTS = [
-          ["More than 40%","25–39%","15–24%","5–14%","Less than 5%"],
-          ["3–7 days","8–14 days","15–21 days","21–30 days","More than 30 days"],
-          ["Same day","1–2 days","3–5 business days","1–2 weeks","Longer than 2 weeks"],
-          ["Fully ready","Mostly ready","Partially ready","Limited readiness","Not ready yet"],
-          ["More than 10,000","5,000–10,000","3,000–4,999","1,000–2,999","Less than 1,000"],
-        ]
-        return OPTS[qIdx][idx]
-      }),
-      score,
-      profile,
-      lang
-    )
+    const ANSWER_OPTS = [
+      ["More than 40%","25–39%","15–24%","5–14%","Less than 5%"],
+      ["3–7 days","8–14 days","15–21 days","21–30 days","More than 30 days"],
+      ["Same day","1–2 days","3–5 business days","1–2 weeks","Longer than 2 weeks"],
+      ["Fully ready","Mostly ready","Partially ready","Limited readiness","Not ready yet"],
+      ["More than 10,000","5,000–10,000","3,000–4,999","1,000–2,999","Less than 1,000"],
+    ]
+    const answerTexts   = answers.map((idx, qIdx) => ANSWER_OPTS[qIdx][idx])
+    const answerIndices = answers  // raw indices [0,3,0,0,1]
+    const assessmentId = await submitAssessment(answerTexts, answerIndices, score, profile, lang)
 
     // 2. Submit gate contact info, linked to assessment
     await submitGate({
@@ -177,14 +174,10 @@ async function handleSubmit(e) {
               error={errors.picName}
               required
             />
-            <FormField
+            <PhoneField
               label={t('field_whatsapp')}
-              type="tel"
               value={form.whatsapp}
-              onChange={(value) => {
-              const sanitizedValue = value.replace(/\D/g, "")
-              set("whatsapp")(sanitizedValue)
-              }}
+              onChange={set('whatsapp')}
               error={errors.whatsapp}
               required
             />
@@ -193,6 +186,8 @@ async function handleSubmit(e) {
               type="email"
               value={form.email}
               onChange={set('email')}
+              error={errors.email}
+              required
             />
 
             <button

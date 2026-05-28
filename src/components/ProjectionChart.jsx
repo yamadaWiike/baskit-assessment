@@ -101,8 +101,9 @@ export default function ProjectionChart({ profile = 'default' }) {
           <svg
             viewBox="0 0 400 200"
             width="100%"
-            height="auto"
+            height="220"
             preserveAspectRatio="xMidYMid meet"
+            className="chart-container"
           >
             <defs>
               <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">

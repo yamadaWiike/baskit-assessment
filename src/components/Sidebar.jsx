@@ -34,8 +34,8 @@ export default function Sidebar({ type = 'brand' }) {
   const { headlineKey, subKey, bullets, showButton, noteKey } = config[type] ?? config.brand
 
   return (
-    <div className="hidden md:block w-[300px] shrink-0">
-      <div className="rounded-2xl p-6" style={{ background: '#00312F' }}>
+    <div className="w-full md:w-[300px] md:shrink-0">
+      <div className="rounded-2xl p-5 md:p-6" style={{ background: '#00312F' }}>
         <h3 className="font-sans font-bold text-lg text-white leading-[1.3] mb-4">
           {t(headlineKey)}
         </h3>
@@ -55,16 +55,15 @@ export default function Sidebar({ type = 'brand' }) {
 
         {showButton && (
           <>
-            <button
-              onClick={() => {
-                // TODO: replace '/' with 'https://brand-assessment.baskit.app' when live
-                window.open('/assessment', '_blank')
-              }}
-              className="w-full font-bold rounded-full py-3 text-sm cursor-pointer transition-opacity hover:opacity-85"
+            <a
+              href="/assessment"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center whitespace-nowrap font-bold rounded-full px-3 py-3 text-xs sm:text-sm cursor-pointer transition-opacity hover:opacity-85"
               style={{ background: '#7ED6DF', color: '#021212' }}
             >
               {t('contact_sidebar_brand_cta')}
-            </button>
+            </a>
             <p className="text-center text-xs mt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
               {t('sidebar_brand_note')}
             </p>

@@ -5,10 +5,9 @@ import ComparisonRows from '../components/ComparisonRows'
 import { useLang } from '../context/LangContext'
 import { getScoreLabel } from '../lib/scoring'
 import { profiles } from '../lib/profiles'
-import { useRef, useState } from 'react'
-import { Download } from 'lucide-react'
+import DownloadReportButton from '../components/DownloadReportButton'
 
-const TERMS_URL = 'https://baskit.app/term-condition'
+const TERMS_URL   = 'https://baskit.app/term-condition'
 const PRIVACY_URL = 'https://baskit.app/privacy-policy'
 
 export default function Report({ score, profile }) {
@@ -18,147 +17,95 @@ export default function Report({ score, profile }) {
   const profileContent = profiles[profile]?.[lang] ?? profiles.default[lang]
   const scoreLabel = getScoreLabel(score, t)
 
-  const reportRef = useRef(null)
-  const [downloading, setDownloading] = useState(false)
-
-  function loadHtml2Pdf() {
-    if (window.html2pdf) return Promise.resolve(window.html2pdf)
-    return new Promise((resolve, reject) => {
-      const s = document.createElement('script')
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js'
-      s.onload = () => {
-        if (window.html2pdf) resolve(window.html2pdf)
-        else reject(new Error('html2pdf failed to load'))
-      }
-      s.onerror = () => reject(new Error('Failed to load html2pdf script'))
-      document.head.appendChild(s)
-    })
-  }
-
-  async function downloadReport() {
-    if (!reportRef.current) return
-    setDownloading(true)
-    try {
-      const html2pdf = await loadHtml2Pdf()
-      const opt = {
-        margin: 12,
-        filename: 'baskit-assessment-report.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#FBFAF7', foreignObjectRendering: true },
-        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-      }
-      await html2pdf().set(opt).from(reportRef.current).save()
-    } catch (err) {
-      console.warn('[Report] PDF export error:', err)
-    } finally {
-      setDownloading(false)
-    }
-  }
-
   return (
     <div className="flex flex-col">
+
       <div className="flex-1 max-w-[850px] mx-auto w-full px-6 pt-10 pb-16">
 
-        {/* Download action (not part of export) */}
-        <div className="relative mb-4 flex justify-end">
-          <button
-            onClick={downloadReport}
-            className={
-              `absolute right-0 top-0 z-10
-              flex h-10 w-10 items-center justify-center
-              rounded-full
-              border border-[#E8DDD0]
-              bg-white/70
-              text-[#5B4A3B]
-              backdrop-blur-sm
-              transition
-              hover:bg-[#FAF7F2]`
-            }
-            aria-label="Download report"
-            title="Download report"
-            type="button"
-          >
-            {downloading ? (
-              <span className="w-4 h-4 border-2 border-[#5B4A3B] border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Download size={17} strokeWidth={1.75} />
-            )}
-          </button>
-        </div>
+        <div className="relative">
+          <DownloadReportButton />
 
-        <div ref={reportRef}>
-        {/* Hero — 2 columns desktop, stacked mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
-          {/* Left */}
+          {/* Exportable report content */}
           <div>
-            <p className="text-[10.5px] font-sans font-bold text-[#FF8B00] tracking-[2.5px] uppercase mb-3">
-              {scoreLabel}
-            </p>
-            <h1 className="font-sans font-semibold text-4xl text-[#383B46] leading-[1.1] mb-3 tracking-[-0.4px]">
-              {profileContent.headline}
-            </h1>
-            <p className="text-sm text-[#9B9CA1] leading-[1.75] max-w-[380px]">
-              {profileContent.sub}
-            </p>
-          </div>
 
-          {/* Right — gauge + badge + scale bar */}
-          <div className="flex flex-col items-center gap-3">
-            <GaugeMeter score={score} />
-            <div className="bg-[#FFF4E6] border-[1.5px] border-[#FFD199] text-[#FF8B00] font-bold text-xs px-4 py-1.5 rounded-full tracking-[0.3px]">
-              {scoreLabel}
+          {/* Hero — 2 columns desktop, stacked mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-10">
+
+            {/* Left — headline */}
+            <div>
+              <p className="text-[10.5px] font-sans font-bold text-[#FF8B00] tracking-[2.5px] uppercase mb-3">
+                {scoreLabel}
+              </p>
+              <h1 className="font-sans font-semibold text-4xl text-[#383B46] leading-[1.1] mb-3 tracking-[-0.4px]">
+                {profileContent.headline}
+              </h1>
+              <p className="text-sm text-[#9B9CA1] leading-[1.75] max-w-[380px]">
+                {profileContent.sub}
+              </p>
             </div>
-            <ScaleBar score={score} />
-          </div>
-        </div>
 
-        {/* Potential with Baskit */}
-        <div className="mb-8">
-          <p className="text-[10px] font-bold text-[#FF8B00] tracking-[2.5px] uppercase mb-4">
-            {t('section_potential')}
-          </p>
-          <ProjectionChart profile={profile} />
-        </div>
-
-        {/* Now vs. with Baskit */}
-        <div className="mb-8">
-          <p className="text-[10px] font-bold text-[#FF8B00] tracking-[2.5px] uppercase mb-4">
-            {t('comparison_title')}
-          </p>
-          <ComparisonRows profile={profile} />
-        </div>
-
-        {/* Social proof */}
-        <div className="bg-white border border-[#E2DDD5] rounded-xl p-5 mb-8 flex items-start gap-3">
-          {/* Faces */}
-          <div className="flex shrink-0">
-            {['ML', 'SW', 'AR', '+'].map((init, i) => (
-              <div
-                key={i}
-                className="w-8 h-8 rounded-full bg-[#FFF4E6] border-2 border-white flex items-center justify-center text-[9px] font-bold text-[#FF8B00] shrink-0"
-                style={{ marginRight: i < 3 ? '-8px' : '0' }}
-              >
-                {init}
+            {/* Right — gauge + badge + scale bar */}
+            <div className="flex flex-col items-center gap-3">
+              <GaugeMeter score={score} />
+              <div className="bg-[#FFF4E6] border-[1.5px] border-[#FFD199] text-[#FF8B00] font-bold text-xs px-4 py-1.5 rounded-full tracking-[0.3px]">
+                {scoreLabel}
               </div>
-            ))}
+              <ScaleBar score={score} />
+            </div>
+
           </div>
-          <p
-            className="text-sm text-[#4C4F59] leading-[1.65] pl-1.5"
-            dangerouslySetInnerHTML={{ __html: t('social_proof') }}
-          />
-        </div>
 
-        {/* end of exportable report content */}
-        </div>
+          {/* Potential with Baskit */}
+          <div className="mb-8">
+            <p className="text-[10px] font-bold text-[#FF8B00] tracking-[2.5px] uppercase mb-4">
+              {t('section_potential')}
+            </p>
+            <ProjectionChart profile={profile} />
+          </div>
 
-        {/* What happens next (NOT included in PDF) */}
-        <div className="bg-[#00312F] border border-[#E2DDD5] rounded-2xl p-8 text-left  mb-8">
-          <h2 className="font-sans font-semibold text-[26px] text-white mb-2">{t('next_steps_headline')}</h2>
+          {/* Now vs. with Baskit */}
+          <div className="mb-8">
+            <p className="text-[10px] font-bold text-[#FF8B00] tracking-[2.5px] uppercase mb-4">
+              {t('comparison_title')}
+            </p>
+            <ComparisonRows profile={profile} />
+          </div>
+
+          {/* Social proof */}
+          <div className="bg-white border border-[#E2DDD5] rounded-xl p-5 mb-8 flex items-start gap-3">
+            <div className="flex shrink-0">
+              {['ML', 'SW', 'AR', '+'].map((init, i) => (
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-full bg-[#FFF4E6] border-2 border-white flex items-center justify-center text-[9px] font-bold text-[#FF8B00] shrink-0"
+                  style={{ marginRight: i < 3 ? '-8px' : '0' }}
+                >
+                  {init}
+                </div>
+              ))}
+            </div>
+            <p
+              className="text-sm text-[#4C4F59] leading-[1.65] pl-1.5"
+              dangerouslySetInnerHTML={{ __html: t('social_proof') }}
+            />
+          </div>
+
+        </div>
+      </div>
+        {/* end pdf-report */}
+
+        {/* What happens next — NOT included in PDF */}
+        <div className="pdf-exclude bg-[#00312F] border border-[#E2DDD5] rounded-2xl p-8 text-left mb-8">
+          <h2 className="font-sans font-semibold text-[26px] text-white mb-2">
+            {t('next_steps_headline')}
+          </h2>
           <p
             className="text-sm text-[#e2ddd5e9] leading-[1.7] mb-2"
             dangerouslySetInnerHTML={{ __html: t('next_steps_sub') }}
           />
-          <p className="text-[13px] text-[#969696df] italic mb-6">{t('next_steps_italic')}</p>
+          <p className="text-[13px] text-[#969696df] italic mb-6">
+            {t('next_steps_italic')}
+          </p>
           <div className="flex flex-col sm:flex-row gap-2.5 justify-left flex-wrap">
             <a
               href="https://baskit.app"
@@ -170,25 +117,39 @@ export default function Report({ score, profile }) {
               href={calendlyUrl !== 'placeholder' ? calendlyUrl : '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#7ED6DF] text-[#021212] rounded-full px-6 py-3 text-sm cursor-pointer hover:opacity-85transition-opacity hover:opacity-85 text-center"
+              className="bg-[#7ED6DF] text-[#021212] rounded-full px-6 py-3 text-sm font-semibold cursor-pointer transition-opacity hover:opacity-85 text-center"
             >
               {t('btn_schedule')}
             </a>
           </div>
+        </div>
+
       </div>
+      {/* end main content */}
 
       {/* Footer */}
-      <footer className="border-t border-[#E2DDD5] px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#9B9CA1]">
+      <footer className="pdf-exclude border-t border-[#E2DDD5] px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#9B9CA1]">
         <span>{t('footer_copyright')}</span>
         <div className="flex gap-5">
-          <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#FF8B00] transition">
+          <a
+            href={TERMS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#FF8B00] transition"
+          >
             {t('footer_terms')}
           </a>
-          <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#FF8B00] transition">
+          <a
+            href={PRIVACY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#FF8B00] transition"
+          >
             {t('footer_privacy')}
           </a>
         </div>
       </footer>
+
     </div>
   )
 }

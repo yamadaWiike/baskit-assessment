@@ -31,8 +31,10 @@ export default function GaugeMeter({ score }) {
   return (
     <div className="flex flex-col items-center gap-3">
       <svg
+        width="200"
+        height="122"
         viewBox="0 0 200 122"
-        className="w-full max-w-[220px]"
+        className="w-full max-w-[220px] gauge-container"
         aria-label={`Score: ${score}`}
       >
         {/* Glow track */}
@@ -72,7 +74,7 @@ export default function GaugeMeter({ score }) {
           fontSize="40"
           fontWeight="600"
           letterSpacing="-2"
-          font-sans font-bold
+          fontFamily="Inter, system-ui, sans-serif"
         >
           {displayed}
         </text>
